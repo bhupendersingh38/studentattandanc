@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Backend Test</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #result {
+            background: #2c3e50;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Direct Backend Connection Test</h1>
+    
+    <button onclick="testHealth()">Test /health</button>
+    <button onclick="testDashboard()">Test /dashboard</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="result">Click a button to test...</div>
+
+    <script>
+        const API = 'http://localhost:8000';
+        
+        function log(message, isError = false) {
+            const result = document.getElementById('result');
+            result.className = isError ? 'error' : 'success';
+            result.textContent = message;
+            console.log(message);
+        }
+        
+        async function testHealth() {
+            log('Testing /health...');
+            try {
+                const response = await fetch(`${API}/health`);
+                const data = await response.json();
+                log(`✅ SUCCESS!\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                log(`❌ FAILED!\n\nError: ${error.message}\n\nMake sure:\n1. Backend is running\n2. Check terminal for "Uvicorn running..."\n3. Port 8000 is not blocked`, true);
+            }
+        }
+        
+        async function testDashboard() {
+            log('Testing /api/v1/analytics/dashboard...');
+            try {
+                const response = await fetch(`${API}/api/v1/analytics/dashboard`);
+                const data = await response.json();
+                log(`✅ SUCCESS!\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                log(`❌ FAILED!\n\nError: ${error.message}`, true);
+            }
+        }
+        
+        async function testLogin() {
+            log('Testing login with 21CS001...');
+            try {
+                const response = await fetch(`${API}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: '21CS001',
+                        password: 'Std@C001',
+                        role: 'student'
+                    })
+                });
+                const data = await response.json();
+                log(`✅ SUCCESS!\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                log(`❌ FAILED!\n\nError: ${error.message}`, true);
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 1000);
+        });
+    </script>
+</body>
+</html>

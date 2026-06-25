@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX AI - Dashboard Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.2em;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .api-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .endpoint {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .endpoint.post {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .endpoint-desc {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .response-box {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 AttendX AI</h1>
+            <p>Smart Face Recognition Attendance & Campus Analytics Platform</p>
+            <p style="margin-top: 10px;">
+                <span class="status-indicator"></span>
+                <span>Backend: <strong id="backend-status">Checking...</strong></span>
+                <span style="margin-left: 20px;" class="status-indicator"></span>
+                <span>AI Engine: <strong id="ai-status">Checking...</strong></span>
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">👥 Total Students</div>
+                <div class="stat-value">500</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">✅ Present Today</div>
+                <div class="stat-value">450</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">📊 Attendance Rate</div>
+                <div class="stat-value">90%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">⚠️ At Risk</div>
+                <div class="stat-value">15</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <div class="glass-card">
+                <h2>🔌 Backend API (Port 8000)</h2>
+                <button class="btn" onclick="testBackend()">Test Backend</button>
+                <div id="backend-response" class="response-box" style="display: none;"></div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Available Endpoints:</h3>
+                    <div class="endpoint">
+                        <div class="endpoint-path">GET /health</div>
+                        <div class="endpoint-desc">Health check endpoint</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/auth/login</div>
+                        <div class="endpoint-desc">User authentication</div>
+                    </div>
+                    <div class="endpoint">
+                        <div class="endpoint-path">GET /api/v1/students</div>
+                        <div class="endpoint-desc">Get all students</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/attendance/mark</div>
+                        <div class="endpoint-desc">Mark attendance</div>
+                    </div>
+                    <div class="endpoint">
+                        <div class="endpoint-path">GET /api/v1/analytics/dashboard</div>
+                        <div class="endpoint-desc">Dashboard statistics</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2>🤖 AI Engine (Port 8001)</h2>
+                <button class="btn" onclick="testAIEngine()">Test AI Engine</button>
+                <div id="ai-response" class="response-box" style="display: none;"></div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>AI Endpoints:</h3>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/detect-faces</div>
+                        <div class="endpoint-desc">Face detection</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/recognize</div>
+                        <div class="endpoint-desc">Face recognition</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/verify-liveness</div>
+                        <div class="endpoint-desc">Liveness detection</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/analyze-engagement</div>
+                        <div class="endpoint-desc">Engagement analysis</div>
+                    </div>
+                    <div class="endpoint post">
+                        <div class="endpoint-path">POST /api/v1/predict-attendance</div>
+                        <div class="endpoint-desc">Attendance prediction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2>🚀 Quick Actions</h2>
+            <button class="btn" onclick="testLogin()">Test Login</button>
+            <button class="btn" onclick="testStudents()">Get Students</button>
+            <button class="btn" onclick="testAnalytics()">Get Analytics</button>
+            <button class="btn" onclick="openDocs()">Open API Docs</button>
+            <div id="actions-response" class="response-box" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check services status on load
+        window.onload = function() {
+            checkBackendStatus();
+            checkAIStatus();
+        };
+
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                document.getElementById('backend-status').innerHTML = 
+                    '<span class="success">✓ Online</span>';
+            } catch (error) {
+                document.getElementById('backend-status').innerHTML = 
+                    '<span class="error">✗ Offline</span>';
+            }
+        }
+
+        async function checkAIStatus() {
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                const data = await response.json();
+                document.getElementById('ai-status').innerHTML = 
+                    '<span class="success">✓ Online</span>';
+            } catch (error) {
+                document.getElementById('ai-status').innerHTML = 
+                    '<span class="error">✗ Offline</span>';
+            }
+        }
+
+        async function testBackend() {
+            const responseBox = document.getElementById('backend-response');
+            responseBox.style.display = 'block';
+            responseBox.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                responseBox.innerHTML = '<span class="success">✓ Success!</span><br>' + 
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseBox.innerHTML = '<span class="error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testAIEngine() {
+            const responseBox = document.getElementById('ai-response');
+            responseBox.style.display = 'block';
+            responseBox.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                const data = await response.json();
+                responseBox.innerHTML = '<span class="success">✓ Success!</span><br>' + 
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseBox.innerHTML = '<span class="error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testLogin() {
+            const responseBox = document.getElementById('actions-response');
+            responseBox.style.display = 'block';
+            responseBox.textContent = 'Testing login...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                const data = await response.json();
+                responseBox.innerHTML = '<span class="success">✓ Login Success!</span><br>' + 
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseBox.innerHTML = '<span class="error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testStudents() {
+            const responseBox = document.getElementById('actions-response');
+            responseBox.style.display = 'block';
+            responseBox.textContent = 'Fetching students...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/students');
+                const data = await response.json();
+                responseBox.innerHTML = '<span class="success">✓ Success!</span><br>' + 
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseBox.innerHTML = '<span class="error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testAnalytics() {
+            const responseBox = document.getElementById('actions-response');
+            responseBox.style.display = 'block';
+            responseBox.textContent = 'Fetching analytics...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/analytics/dashboard');
+                const data = await response.json();
+                responseBox.innerHTML = '<span class="success">✓ Success!</span><br>' + 
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseBox.innerHTML = '<span class="error">✗ Error: ' + error.message + '</span>';
+            }
+        }
+
+        function openDocs() {
+            window.open('http://localhost:8000/docs', '_blank');
+        }
+    </script>
+</body>
+</html>

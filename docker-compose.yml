@@ -1,0 +1,152 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: attendx-postgres
+    environment:
+      POSTGRES_DB: attendx_db
+      POSTGRES_USER: attendx_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U attendx_user -d attendx_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: attendx-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # RabbitMQ Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: attendx-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: attendx
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-changeme123}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # AI Engine (Face Recognition)
+  ai-engine:
+    build:
+      context: ./ai-engine
+      dockerfile: Dockerfile
+    container_name: attendx-ai-engine
+    environment:
+      - MODEL_PATH=/app/models
+      - REDIS_URL=redis://redis:6379
+      - GPU_ENABLED=false
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai-engine:/app
+      - ai_models:/app/models
+    depends_on:
+      - redis
+    # Uncomment for GPU support
+    # runtime: nvidia
+    # environment:
+    #   - NVIDIA_VISIBLE_DEVICES=all
+
+  # Backend API (FastAPI)
+  backend-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: attendx-backend
+    environment:
+      - DATABASE_URL=postgresql://attendx_user:${DB_PASSWORD:-changeme123}@postgres:5432/attendx_db
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://attendx:${RABBITMQ_PASSWORD:-changeme123}@rabbitmq:5672
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - AI_ENGINE_URL=http://ai-engine:8001
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - face_data:/app/face_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ai-engine:
+        condition: service_started
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: attendx-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
+      - NEXT_PUBLIC_AI_ENGINE_URL=http://localhost:8001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend-api
+
+  # Notification Worker
+  notification-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    container_name: attendx-notification-worker
+    environment:
+      - DATABASE_URL=postgresql://attendx_user:${DB_PASSWORD:-changeme123}@postgres:5432/attendx_db
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://attendx:${RABBITMQ_PASSWORD:-changeme123}@rabbitmq:5672
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  ai_models:
+  face_data:
+
+networks:
+  default:
+    name: attendx-network

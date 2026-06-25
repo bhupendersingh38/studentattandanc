@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AttendX AI</title>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">👨‍💼</div>
+            <h2>Admin Panel</h2>
+        </div>
+        
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-page="overview">
+                <span class="nav-icon">📊</span>
+                <span>Overview</span>
+            </a>
+            <a href="#" class="nav-item" data-page="teachers">
+                <span class="nav-icon">👨‍🏫</span>
+                <span>Manage Teachers</span>
+            </a>
+            <a href="#" class="nav-item" data-page="students">
+                <span class="nav-icon">👥</span>
+                <span>Manage Students</span>
+            </a>
+            <a href="#" class="nav-item" data-page="attendance">
+                <span class="nav-icon">📋</span>
+                <span>All Attendance</span>
+            </a>
+            <a href="#" class="nav-item" data-page="timetable">
+                <span class="nav-icon">📅</span>
+                <span>Time Table</span>
+            </a>
+            <a href="#" class="nav-item" data-page="reports">
+                <span class="nav-icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h1 id="pageTitle">Admin Dashboard</h1>
+            <div class="top-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search..." id="globalSearch">
+                    <button>🔍</button>
+                </div>
+                <div class="admin-info">
+                    <span>Admin: <strong>Super Admin</strong></span>
+                    <div class="admin-avatar">SA</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Overview Page -->
+        <div class="page active" id="overview-page">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3 id="totalStudents">0</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">👨‍🏫</div>
+                    <div class="stat-info">
+                        <h3 id="totalTeachers">0</h3>
+                        <p>Total Teachers</p>
+                    </div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <h3 id="totalClasses">0</h3>
+                        <p>Total Classes</p>
+                    </div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <h3 id="todayAttendance">0%</h3>
+                        <p>Today's Attendance</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Recent Activities</h3>
+                    <div class="activity-list" id="recentActivities"></div>
+                </div>
+                <div class="card">
+                    <h3>System Status</h3>
+                    <div class="system-status">
+                        <div class="status-item">
+                            <span>Backend API</span>
+                            <span class="status-badge online">Online</span>
+                        </div>
+                        <div class="status-item">
+                            <span>AI Engine</span>
+                            <span class="status-badge online">Online</span>
+                        </div>
+                        <div class="status-item">
+                            <span>SMS Service</span>
+                            <span class="status-badge online">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Teachers Page -->
+        <div class="page" id="teachers-page">
+            <div class="page-actions">
+                <button class="btn-primary" onclick="showAddTeacherModal()">
+                    <span>➕</span> Add New Teacher
+                </button>
+                <input type="text" placeholder="Search teachers..." class="search-input">
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Classes</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Manage Students Page -->
+        <div class="page" id="students-page">
+            <div class="page-actions">
+                <select id="semesterFilter" class="filter-select">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+                <select id="classFilter" class="filter-select">
+                    <option value="">All Classes</option>
+                    <option value="A">Class A</option>
+                    <option value="B">Class B</option>
+                    <option value="C">Class C</option>
+                </select>
+                <input type="text" placeholder="Search students..." class="search-input" id="studentSearch">
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Semester</th>
+                            <th>Class</th>
+                            <th>Phone</th>
+                            <th>Parent Phone</th>
+                            <th>Attendance %</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Attendance Page -->
+        <div class="page" id="attendance-page">
+            <div class="page-actions">
+                <input type="date" id="attendanceDate" class="date-input">
+                <select id="attendanceSemester" class="filter-select">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                </select>
+                <button class="btn-primary" onclick="loadAttendanceData()">
+                    <span>🔍</span> Load Data
+                </button>
+                <button class="btn-secondary" onclick="exportAttendance()">
+                    <span>📥</span> Export
+                </button>
+            </div>
+
+            <div class="attendance-grid" id="attendanceGrid"></div>
+        </div>
+
+        <!-- Time Table Page -->
+        <div class="page" id="timetable-page">
+            <div class="page-actions">
+                <button class="btn-primary" onclick="showAddTimetableModal()">
+                    <span>➕</span> Add Schedule
+                </button>
+                <select id="timetableSemester" class="filter-select">
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                </select>
+            </div>
+
+            <div class="timetable-container">
+                <table class="timetable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timetableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div class="page" id="reports-page">
+            <div class="reports-grid">
+                <div class="report-card" onclick="generateReport('daily')">
+                    <div class="report-icon">📅</div>
+                    <h3>Daily Report</h3>
+                    <p>Generate today's attendance report</p>
+                </div>
+                <div class="report-card" onclick="generateReport('weekly')">
+                    <div class="report-icon">📊</div>
+                    <h3>Weekly Report</h3>
+                    <p>Last 7 days summary</p>
+                </div>
+                <div class="report-card" onclick="generateReport('monthly')">
+                    <div class="report-icon">📈</div>
+                    <h3>Monthly Report</h3>
+                    <p>Complete month analysis</p>
+                </div>
+                <div class="report-card" onclick="generateReport('custom')">
+                    <div class="report-icon">🔧</div>
+                    <h3>Custom Report</h3>
+                    <p>Select date range</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="settings-page">
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3>System Settings</h3>
+                    <div class="setting-item">
+                        <label>Face Match Threshold (%)</label>
+                        <input type="number" value="85" min="60" max="100">
+                    </div>
+                    <div class="setting-item">
+                        <label>Attendance Distance (meters)</label>
+                        <input type="number" value="20" min="5" max="50">
+                    </div>
+                    <div class="setting-item">
+                        <label>SMS Notifications</label>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Auto Verify Attendance</label>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn-primary">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Teacher Modal -->
+    <div id="addTeacherModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addTeacherModal')">&times;</span>
+            <h2>Add New Teacher</h2>
+            <form id="addTeacherForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" required placeholder="Teacher Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" required placeholder="+91 9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>Department *</label>
+                        <select required>
+                            <option value="">Select Department</option>
+                            <option value="CSE">Computer Science</option>
+                            <option value="ECE">Electronics</option>
+                            <option value="ME">Mechanical</option>
+                            <option value="CE">Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Generate Login ID</label>
+                        <input type="text" placeholder="Auto-generated" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Add Teacher</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addTeacherModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>

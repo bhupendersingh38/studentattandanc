@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX AI - Connection Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 48px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .status-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.checking {
+            background: #f59e0b;
+        }
+
+        .status-dot.online {
+            background: #10b981;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .info {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid #6366f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .code {
+            background: #1e293b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 AttendX AI</h1>
+            <p style="color: #94a3b8;">Connection Test & Status</p>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Service Status</h2>
+            
+            <div class="status">
+                <div class="status-dot checking" id="backend-dot"></div>
+                <div style="flex: 1;">
+                    <strong>Backend API</strong><br>
+                    <small style="color: #94a3b8;">http://localhost:8000</small>
+                </div>
+                <div id="backend-status">Checking...</div>
+            </div>
+
+            <div class="status">
+                <div class="status-dot checking" id="ai-dot"></div>
+                <div style="flex: 1;">
+                    <strong>AI Engine</strong><br>
+                    <small style="color: #94a3b8;">http://localhost:8001</small>
+                </div>
+                <div id="ai-status">Checking...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Quick Actions</h2>
+            
+            <button class="btn" onclick="window.open('http://localhost:8000/docs', '_blank')">
+                📚 Open Backend API Docs
+            </button>
+            
+            <button class="btn" onclick="window.open('http://localhost:8001/docs', '_blank')">
+                🤖 Open AI Engine Docs
+            </button>
+            
+            <button class="btn" onclick="window.open('complete_dashboard.html', '_blank')">
+                📊 Open Complete Dashboard
+            </button>
+        </div>
+
+        <div class="info">
+            <strong>💡 Tip:</strong> If services show offline, make sure both Python servers are running in the terminal windows.
+        </div>
+
+        <div class="card" id="response-box" style="display: none;">
+            <h2 style="margin-bottom: 20px;">Test Response</h2>
+            <div id="response-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const AI_URL = 'http://localhost:8001';
+
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                document.getElementById('backend-dot').className = 'status-dot online';
+                document.getElementById('backend-status').innerHTML = '<span class="success">✓ Online</span>';
+                
+                console.log('Backend response:', data);
+                return true;
+            } catch (error) {
+                document.getElementById('backend-dot').className = 'status-dot offline';
+                document.getElementById('backend-status').innerHTML = '<span class="error">✗ Offline</span>';
+                
+                console.error('Backend error:', error);
+                return false;
+            }
+        }
+
+        async function checkAI() {
+            try {
+                const response = await fetch(`${AI_URL}/health`);
+                const data = await response.json();
+                
+                document.getElementById('ai-dot').className = 'status-dot online';
+                document.getElementById('ai-status').innerHTML = '<span class="success">✓ Online</span>';
+                
+                console.log('AI Engine response:', data);
+                return true;
+            } catch (error) {
+                document.getElementById('ai-dot').className = 'status-dot offline';
+                document.getElementById('ai-status').innerHTML = '<span class="error">✗ Offline</span>';
+                
+                console.error('AI Engine error:', error);
+                return false;
+            }
+        }
+
+        async function testAPI() {
+            const responseBox = document.getElementById('response-box');
+            const responseContent = document.getElementById('response-content');
+            
+            responseBox.style.display = 'block';
+            responseContent.innerHTML = '<p>Testing APIs...</p>';
+
+            try {
+                // Test Backend
+                const backendRes = await fetch(`${API_URL}/api/v1/students`);
+                const backendData = await backendRes.json();
+
+                // Test AI Engine  
+                const aiRes = await fetch(`${AI_URL}/health`);
+                const aiData = await aiRes.json();
+
+                responseContent.innerHTML = `
+                    <div class="code">
+                        <strong class="success">✓ Backend Test Successful</strong><br>
+                        Students found: ${backendData.length}<br><br>
+                        <strong class="success">✓ AI Engine Test Successful</strong><br>
+                        ${JSON.stringify(aiData, null, 2)}
+                    </div>
+                `;
+            } catch (error) {
+                responseContent.innerHTML = `
+                    <div class="code">
+                        <strong class="error">✗ Test Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Check status on load
+        window.onload = async function() {
+            const backendOnline = await checkBackend();
+            const aiOnline = await checkAI();
+
+            if (backendOnline && aiOnline) {
+                setTimeout(() => {
+                    alert('✅ All services are online!\n\nClick the buttons below to:\n• View API Documentation\n• Open Complete Dashboard');
+                }, 500);
+            } else {
+                alert('⚠️ Some services are offline!\n\nMake sure Python servers are running:\n• backend/main.py\n• ai-engine/main.py');
+            }
+
+            // Auto-test after 1 second
+            setTimeout(testAPI, 1000);
+        };
+    </script>
+</body>
+</html>

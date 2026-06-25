@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX AI - Complete System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary { background: rgba(255, 255, 255, 0.3); color: white; }
+        .btn-primary:hover { background: rgba(255, 255, 255, 0.4); }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group select {
+            background: rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .form-group select option {
+            background: #667eea;
+            color: white;
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active { border-bottom-color: white; font-weight: bold; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .student-grid, .timetable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-card h3 { font-size: 2.5em; margin: 10px 0; }
+
+        .hidden { display: none !important; }
+        
+        .video-container { position: relative; width: 100%; max-width: 640px; margin: 0 auto; }
+        video { width: 100%; border-radius: 10px; }
+        
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; padding: 15px; border-radius: 10px; margin: 10px 0; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; padding: 15px; border-radius: 10px; margin: 10px 0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        table th { background: rgba(255, 255, 255, 0.1); font-weight: 600; }
+        
+        .photo-preview { max-width: 200px; border-radius: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage">
+            <div style="text-align: center; padding: 50px 0;">
+                <h1 style="font-size: 3em; margin-bottom: 10px;">🎓 AttendX AI</h1>
+                <p>Complete Smart Attendance System</p>
+            </div>
+            
+            <div class="glass" style="max-width: 450px; margin: 0 auto;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Login</h2>
+                <div id="loginError" class="error hidden"></div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="userId" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="role">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+                
+                <div style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                    <strong>Demo:</strong><br>
+                    Student: 21CS001 / Std@C001<br>
+                    Teacher: T001 / Tech@T001<br>
+                    Admin: ADM001 / Adm@001
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden">
+            <div class="header">
+                <div>
+                    <h1 id="welcomeText">Welcome!</h1>
+                    <p id="roleText"></p>
+                </div>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" data-tab="overview">Overview</div>
+                <div class="tab" data-tab="students" id="studentsTab">Students</div>
+                <div class="tab" data-tab="attendance" id="attendanceTab">Attendance</div>
+                <div class="tab" data-tab="timetable" id="timetableTab">Timetable</div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview">
+                <div class="stats">
+                    <div class="stat-card">
+                        <p>Total Students</p>
+                        <h3 id="totalStudents">0</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>Present Today</p>
+                        <h3 id="presentToday">0</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>Attendance Rate</p>
+                        <h3 id="attendanceRate">0%</h3>
+                    </div>
+                    <div class="stat-card">
+                        <p>At Risk</p>
+                        <h3 id="atRisk">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div class="tab-content" id="students">
+                <div class="glass">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Students Management</h2>
+                        <button class="btn btn-success" id="addStudentBtn" onclick="openAddStudent()">+ Add Student</button>
+                    </div>
+                    <div id="studentsList" class="student-grid"></div>
+                </div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div class="tab-content" id="attendance">
+                <div class="glass">
+                    <h2 style="margin-bottom: 20px;">Mark Attendance</h2>
+                    <div id="attendanceContent"></div>
+                </div>
+            </div>
+
+            <!-- Timetable Tab -->
+            <div class="tab-content" id="timetable">
+                <div class="glass">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Timetable Management</h2>
+                        <button class="btn btn-success" id="addTimetableBtn" onclick="openAddTimetable()">+ Add Timetable</button>
+                    </div>
+                    <div id="timetableList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeAddStudent()">&times;</span>
+            <h2>Register New Student</h2>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Roll Number</label>
+                    <input type="text" name="roll_number" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Parent Phone</label>
+                    <input type="tel" name="parent_phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="semester" required>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Class Section</label>
+                    <input type="text" name="class_section" required>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" name="department" required>
+                </div>
+                <div class="form-group">
+                    <label>Student Photo</label>
+                    <input type="file" name="photo" accept="image/*" required>
+                    <img id="photoPreview" class="photo-preview hidden" />
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">Register Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Timetable Modal -->
+    <div id="addTimetableModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeAddTimetable()">&times;</span>
+            <h2>Add Timetable Entry</h2>
+            <form id="addTimetableForm">
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="semester" required>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Class Section</label>
+                    <input type="text" name="class_section" required>
+                </div>
+                <div class="form-group">
+                    <label>Day</label>
+                    <select name="day" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Time Slot</label>
+                    <input type="text" name="time_slot" placeholder="e.g., 09:00-10:00" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label>Teacher (Select from list)</label>
+                    <select name="teacher_id" id="teacherSelect" required>
+                        <option value="">-- Select Teacher --</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">Add to Timetable</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentUser = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                // Load content based on tab
+                if (tab.dataset.tab === 'students') loadStudents();
+                if (tab.dataset.tab === 'attendance') loadAttendancePage();
+                if (tab.dataset.tab === 'timetable') loadTimetable();
+            });
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, password, role })
+                });
+
+                if (!response.ok) throw new Error('Login failed');
+                
+                currentUser = await response.json();
+                showDashboard();
+            } catch (error) {
+                document.getElementById('loginError').textContent = error.message;
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('welcomeText').textContent = `Welcome, ${currentUser.profile?.name || currentUser.user_id}!`;
+            document.getElementById('roleText').textContent = `Role: ${currentUser.role.toUpperCase()}`;
+            
+            // Show/hide tabs based on role
+            if (currentUser.role === 'student') {
+                document.getElementById('studentsTab').classList.add('hidden');
+                document.getElementById('addStudentBtn').classList.add('hidden');
+                document.getElementById('addTimetableBtn').classList.add('hidden');
+            } else if (currentUser.role === 'teacher') {
+                document.getElementById('addTimetableBtn').classList.add('hidden');
+            }
+            
+            loadOverview();
+        }
+
+        async function loadOverview() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/analytics/dashboard`);
+                const data = await response.json();
+                
+                document.getElementById('totalStudents').textContent = data.total_students || 0;
+                document.getElementById('presentToday').textContent = data.present_today || 0;
+                document.getElementById('attendanceRate').textContent = `${Math.round(data.today_percentage || 0)}%`;
+                document.getElementById('atRisk').textContent = data.at_risk_count || 0;
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        async function loadStudents() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/students`);
+                const students = await response.json();
+                
+                const list = document.getElementById('studentsList');
+                list.innerHTML = students.map(s => `
+                    <div class="card">
+                        <h3>${s.name}</h3>
+                        <p><strong>Roll:</strong> ${s.roll_number}</p>
+                        <p><strong>Sem:</strong> ${s.semester} | <strong>Section:</strong> ${s.class_section}</p>
+                        <p><strong>Attendance:</strong> ${s.attendance_percentage}%</p>
+                        ${currentUser.role === 'admin' ? `<button class="btn btn-primary" onclick="editStudent(${s.id})">Edit</button>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        async function loadTimetable() {
+            // Implement timetable loading
+            document.getElementById('timetableList').innerHTML = '<p>Timetable feature coming soon...</p>';
+        }
+
+        function loadAttendancePage() {
+            if (currentUser.role === 'student') {
+                document.getElementById('attendanceContent').innerHTML = `
+                    <div id="locationStatus" class="error">📍 Checking location...</div>
+                    <p>Step 1: Enable your device location</p>
+                    <p>Step 2: Teacher must have location enabled</p>
+                    <p>Step 3: You must be within 20 meters of teacher</p>
+                    <button class="btn btn-success" onclick="checkLocationAndStartCamera()">Check Location & Start</button>
+                    <div id="cameraView" class="hidden">
+                        <video id="video" autoplay></video>
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <div id="distanceInfo"></div>
+                        <button class="btn btn-primary" onclick="captureAttendance()">Mark Attendance</button>
+                    </div>
+                `;
+            } else if (currentUser.role === 'teacher') {
+                loadTeacherAttendance();
+            }
+        }
+
+        let teacherLocation = null;
+        let studentLocation = null;
+
+        async function checkLocationAndStartCamera() {
+            const statusDiv = document.getElementById('locationStatus');
+            
+            // Get student location
+            statusDiv.innerHTML = '📍 Getting your location...';
+            try {
+                studentLocation = await getCurrentLocation();
+                statusDiv.innerHTML = `✅ Your location: ${studentLocation.lat.toFixed(4)}, ${studentLocation.lng.toFixed(4)}`;
+                
+                // Check teacher location
+                statusDiv.innerHTML += '<br>📡 Checking teacher location...';
+                const response = await fetch(`${API_URL}/api/v1/teacher/location/${currentUser.profile.teacher_id || 1}`);
+                const data = await response.json();
+                
+                if (!data.location_enabled) {
+                    statusDiv.innerHTML = '❌ Teacher location is not enabled. Please wait for teacher to enable location.';
+                    statusDiv.className = 'error';
+                    return;
+                }
+                
+                teacherLocation = data.location;
+                
+                // Calculate distance
+                const distance = calculateDistance(
+                    studentLocation.lat, studentLocation.lng,
+                    teacherLocation.lat, teacherLocation.lng
+                );
+                
+                if (distance > 20) {
+                    statusDiv.innerHTML = `❌ You are ${distance.toFixed(0)} meters away from teacher. Must be within 20 meters!`;
+                    statusDiv.className = 'error';
+                    return;
+                }
+                
+                statusDiv.innerHTML = `✅ Distance check passed! You are ${distance.toFixed(1)} meters from teacher.`;
+                statusDiv.className = 'success';
+                
+                // Start camera
+                document.getElementById('cameraView').classList.remove('hidden');
+                startCamera();
+                
+            } catch (error) {
+                statusDiv.innerHTML = '❌ Error: ' + error.message;
+                statusDiv.className = 'error';
+            }
+        }
+
+        function getCurrentLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation not supported'));
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        });
+                    },
+                    (error) => {
+                        reject(new Error('Please enable location services: ' + error.message));
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            // Haversine formula for distance in meters
+            const R = 6371000; // Earth radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distance in meters
+        }
+
+        async function loadTeacherAttendance() {
+            const content = document.getElementById('attendanceContent');
+            content.innerHTML = `
+                <div class="glass" style="margin-bottom: 20px;">
+                    <h3>📍 Your Location Status</h3>
+                    <p id="teacherLocationStatus">Checking...</p>
+                    <button class="btn btn-success" onclick="enableTeacherLocation()">Enable My Location</button>
+                    <button class="btn btn-danger" onclick="disableTeacherLocation()">Disable My Location</button>
+                </div>
+                <div class="glass">
+                    <h3>My Classes - Pending Verifications</h3>
+                    <div id="pendingList">Loading...</div>
+                </div>
+            `;
+            
+            loadPendingVerifications();
+        }
+
+        async function enableTeacherLocation() {
+            try {
+                const location = await getCurrentLocation();
+                const response = await fetch(`${API_URL}/api/v1/teacher/location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        teacher_id: currentUser.profile.id,
+                        latitude: location.lat,
+                        longitude: location.lng,
+                        enabled: true
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('teacherLocationStatus').innerHTML = 
+                        `✅ Location Enabled<br>Lat: ${location.lat.toFixed(4)}, Lng: ${location.lng.toFixed(4)}<br>Students can now mark attendance if within 20m`;
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function disableTeacherLocation() {
+            const response = await fetch(`${API_URL}/api/v1/teacher/location`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teacher_id: currentUser.profile.id,
+                    enabled: false
+                })
+            });
+            
+            if (response.ok) {
+                document.getElementById('teacherLocationStatus').innerHTML = '❌ Location Disabled - Students cannot mark attendance';
+            }
+        }
+
+        async function loadPendingVerifications() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/attendance/pending-verification?teacher_id=${currentUser.profile.id}`);
+                const pending = await response.json();
+                
+                const listDiv = document.getElementById('pendingList');
+                if (pending.length === 0) {
+                    listDiv.innerHTML = '<p>No pending verifications</p>';
+                    return;
+                }
+                
+                listDiv.innerHTML = `
+                    <table>
+                        <tr>
+                            <th>Student</th>
+                            <th>Subject</th>
+                            <th>Time</th>
+                            <th>Confidence</th>
+                            <th>Distance</th>
+                            <th>Action</th>
+                        </tr>
+                        ${pending.map(p => `
+                            <tr>
+                                <td>${p.student_name}</td>
+                                <td>${p.subject}</td>
+                                <td>${p.time}</td>
+                                <td>${p.confidence_score}%</td>
+                                <td>${p.distance_verified ? '✅ Within 20m' : '❌ Too far'}</td>
+                                <td>
+                                    <button class="btn btn-success" onclick="verifyAttendance(${p.id}, 'approved')">✅ Approve</button>
+                                    <button class="btn btn-danger" onclick="verifyAttendance(${p.id}, 'rejected')">❌ Reject</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading pending verifications:', error);
+            }
+        }
+
+        async function verifyAttendance(attendanceId, status) {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/attendance/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        attendance_id: attendanceId,
+                        status: status,
+                        notes: status === 'approved' ? 'Verified by teacher' : 'Rejected - possible proxy'
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Attendance ' + status);
+                    loadPendingVerifications();
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = stream;
+            } catch (error) {
+                alert('Camera access denied: ' + error.message);
+            }
+        }
+
+        async function captureAttendance() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg');
+            
+            try {
+                // Calculate current distance again
+                const currentLocation = await getCurrentLocation();
+                const distance = calculateDistance(
+                    currentLocation.lat, currentLocation.lng,
+                    teacherLocation.lat, teacherLocation.lng
+                );
+                
+                if (distance > 20) {
+                    alert(`Distance check failed! You are ${distance.toFixed(0)}m away. Must be within 20m.`);
+                    return;
+                }
+                
+                const response = await fetch(`${API_URL}/api/v1/attendance/mark`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        student_id: currentUser.profile.id,
+                        teacher_id: 1, // Get from timetable
+                        subject: 'Current Subject', // Get from timetable
+                        image_data: imageData,
+                        latitude: currentLocation.lat,
+                        longitude: currentLocation.lng,
+                        distance_from_teacher: distance,
+                        distance_verified: distance <= 20
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('✅ Attendance marked! Distance: ' + distance.toFixed(1) + 'm. Waiting for teacher verification.');
+                    document.getElementById('cameraView').classList.add('hidden');
+                } else {
+                    alert('❌ Failed to mark attendance. Please try again.');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function openAddStudent() {
+            document.getElementById('addStudentModal').style.display = 'block';
+        }
+
+        function closeAddStudent() {
+            document.getElementById('addStudentModal').style.display = 'none';
+        }
+
+        function openAddTimetable() {
+            // Load teachers list
+            fetch(`${API_URL}/api/v1/teachers`)
+                .then(res => res.json())
+                .then(teachers => {
+                    const select = document.getElementById('teacherSelect');
+                    select.innerHTML = '<option value="">-- Select Teacher --</option>' +
+                        teachers.map(t => `<option value="${t.id}">${t.name} (${t.teacher_id})</option>`).join('');
+                });
+            
+            document.getElementById('addTimetableModal').style.display = 'block';
+        }
+
+        function closeAddTimetable() {
+            document.getElementById('addTimetableModal').style.display = 'none';
+        }
+
+        // Add Student Form
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                // First register student
+                const studentData = {
+                    name: formData.get('name'),
+                    roll_number: formData.get('roll_number'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    parent_phone: formData.get('parent_phone'),
+                    semester: parseInt(formData.get('semester')),
+                    class_section: formData.get('class_section'),
+                    department: formData.get('department')
+                };
+                
+                const response = await fetch(`${API_URL}/api/v1/students`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(studentData)
+                });
+                
+                if (!response.ok) throw new Error('Failed to register student');
+                
+                const result = await response.json();
+                
+                // Upload photo
+                const photoFile = formData.get('photo');
+                if (photoFile) {
+                    const photoFormData = new FormData();
+                    photoFormData.append('file', photoFile);
+                    
+                    await fetch(`${API_URL}/api/v1/students/${result.student_id}/photo`, {
+                        method: 'POST',
+                        body: photoFormData
+                    });
+                }
+                
+                alert(`Student registered successfully!\nUser ID: ${result.credentials.user_id}\nPassword: ${result.credentials.password}`);
+                closeAddStudent();
+                loadStudents();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Add Timetable Form
+        document.getElementById('addTimetableForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const data = {
+                semester: parseInt(formData.get('semester')),
+                class_section: formData.get('class_section'),
+                day: formData.get('day'),
+                time_slot: formData.get('time_slot'),
+                subject: formData.get('subject'),
+                teacher_id: currentUser.profile.id
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/timetable`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) throw new Error('Failed to add timetable');
+                
+                alert('Timetable entry added successfully!');
+                closeAddTimetable();
+                loadTimetable();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Photo preview
+        document.querySelector('input[name="photo"]').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('photoPreview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+        }
+    </script>
+</body>
+</html>

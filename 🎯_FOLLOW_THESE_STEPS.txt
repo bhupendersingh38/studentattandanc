@@ -1,0 +1,111 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║         🎯 FOLLOW THESE EXACT STEPS                      ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+
+STEP 1: Check Backend Terminal
+═══════════════════════════════════════════════════════════
+
+Look for a terminal/command window that shows:
+  "Uvicorn running on http://0.0.0.0:8000"
+
+• If you see it: ✅ Great! Go to Step 2
+• If you DON'T see it: ❌ Go to Step 1b
+
+
+STEP 1b: Start Backend (If Not Running)
+═══════════════════════════════════════════════════════════
+
+1. Double-click: START_BACKEND_ONLY.bat
+2. Wait 5 seconds
+3. You should see: "Uvicorn running on http://0.0.0.0:8000"
+4. Keep this window OPEN!
+
+
+STEP 2: Open the Application
+═══════════════════════════════════════════════════════════
+
+1. Double-click: app.html
+2. If you see "Backend is not running" alert:
+   - Click OK
+   - Wait 3 seconds
+   - Press F5 to refresh
+3. You should now see the login page
+
+
+STEP 3: Login
+═══════════════════════════════════════════════════════════
+
+Use these credentials:
+
+Student:
+  User ID:  21CS001
+  Password: Std@C001
+
+Teacher:
+  User ID:  T001
+  Password: Tech@T001
+
+Admin:
+  User ID:  ADM001
+  Password: Adm@001
+
+
+🔧 TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════
+
+Problem: "Backend is not running" keeps showing
+Solution:
+  1. Check the backend terminal is open
+  2. Look for "Uvicorn running" message
+  3. Wait 5 seconds after opening
+  4. Refresh browser (F5)
+
+Problem: Can't see backend terminal
+Solution:
+  1. Look at your taskbar for Command Prompt windows
+  2. Or just run START_BACKEND_ONLY.bat again
+  3. You'll see a black window with text
+
+Problem: Nothing happens when I login
+Solution:
+  1. Open browser console (F12)
+  2. Check for errors
+  3. Make sure backend is running
+  4. Try refreshing
+
+
+✅ QUICK CHECK:
+═══════════════════════════════════════════════════════════
+
+Open this in browser: http://localhost:8000/docs
+
+If you see a page with "FastAPI" and API documentation:
+  ✅ Backend is working!
+  ✅ Just refresh app.html
+
+If you see "can't reach this page":
+  ❌ Backend not running
+  ❌ Run START_BACKEND_ONLY.bat
+
+
+📝 SUMMARY:
+═══════════════════════════════════════════════════════════
+
+1. Make sure START_BACKEND_ONLY.bat is running
+   (You'll see a terminal window)
+
+2. Open app.html in browser
+
+3. If alert shows, click OK and refresh after 5 seconds
+
+4. Login and enjoy!
+
+
+═══════════════════════════════════════════════════════════
+
+              🚀 You Got This! 🚀
+
+═══════════════════════════════════════════════════════════

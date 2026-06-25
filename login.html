@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AttendX AI</title>
+    <link rel="stylesheet" href="login-style.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Background Animation -->
+        <div class="bg-animation">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="login-card">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-icon">📷</div>
+                <h1 class="logo-title">AttendX AI</h1>
+                <p class="logo-subtitle">Smart Attendance System</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <button class="role-btn active" data-role="student" onclick="selectRole('student')">
+                    <span class="role-icon">🎓</span>
+                    <span>Student</span>
+                </button>
+                <button class="role-btn" data-role="teacher" onclick="selectRole('teacher')">
+                    <span class="role-icon">👨‍🏫</span>
+                    <span>Teacher</span>
+                </button>
+                <button class="role-btn" data-role="admin" onclick="selectRole('admin')">
+                    <span class="role-icon">👨‍💼</span>
+                    <span>Admin</span>
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="userId">User ID / Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="userId" placeholder="Enter your ID" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" placeholder="Enter password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span>Login</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <!-- Demo Credentials -->
+            <div class="demo-credentials">
+                <h4>Demo Credentials</h4>
+                <div class="credential-grid">
+                    <div class="credential-item">
+                        <span class="cred-role">Student:</span>
+                        <span class="cred-id">21CS001</span>
+                        <span class="cred-pass">student123</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="cred-role">Teacher:</span>
+                        <span class="cred-id">T001</span>
+                        <span class="cred-pass">teacher123</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="cred-role">Admin:</span>
+                        <span class="cred-id">admin</span>
+                        <span class="cred-pass">admin123</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">📷</span>
+                    <span class="feature-text">Face Recognition</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <span class="feature-text">Anti-Spoofing</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <span class="feature-text">SMS Alerts</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-text">Analytics</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <div class="info-content">
+                <h2>Welcome to AttendX AI</h2>
+                <p>Advanced AI-powered attendance management system with face recognition and real-time analytics.</p>
+                
+                <div class="info-stats">
+                    <div class="info-stat">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="info-stat">
+                        <div class="stat-number">45+</div>
+                        <div class="stat-label">Teachers</div>
+                    </div>
+                    <div class="info-stat">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="info-features">
+                    <h3>Key Features</h3>
+                    <ul>
+                        <li>✓ Real-time Face Recognition</li>
+                        <li>✓ Liveness Detection (Anti-Spoofing)</li>
+                        <li>✓ 20m Distance Verification</li>
+                        <li>✓ Automatic SMS Notifications</li>
+                        <li>✓ Teacher Verification System</li>
+                        <li>✓ Comprehensive Analytics</li>
+                        <li>✓ Parent Notifications</li>
+                        <li>✓ Mobile Responsive</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login-script.js"></script>
+</body>
+</html>

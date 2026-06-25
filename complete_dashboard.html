@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX AI - Complete Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin: 6px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #94a3b8;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .chart-card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Camera Section */
+        .camera-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .recognized-students {
+            margin-top: 20px;
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .confidence {
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">📷</div>
+                <div class="logo-text">AttendX AI</div>
+            </div>
+
+            <nav>
+                <div class="nav-item active" onclick="showPage('dashboard')">
+                    📊 Dashboard
+                </div>
+                <div class="nav-item" onclick="showPage('attendance')">
+                    📷 Mark Attendance
+                </div>
+                <div class="nav-item" onclick="showPage('students')">
+                    👥 Students
+                </div>
+                <div class="nav-item" onclick="showPage('analytics')">
+                    📈 Analytics
+                </div>
+                <div class="nav-item" onclick="alert('Coming soon!')">
+                    🔔 Notifications
+                </div>
+                <div class="nav-item" onclick="alert('Coming soon!')">
+                    ⚙️ Settings
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back! Here's your attendance overview.</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">👥</div>
+                        <div class="stat-value" id="total-students">500</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">✓</div>
+                        <div class="stat-value" id="present-today">450</div>
+                        <div class="stat-label">Present Today</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">✗</div>
+                        <div class="stat-value" id="absent-today">50</div>
+                        <div class="stat-label">Absent Today</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">⚠</div>
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">At Risk</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h2>Weekly Attendance Trend</h2>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h2>Subject-wise Attendance</h2>
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Page -->
+            <div id="attendance-page" style="display: none;">
+                <div class="header">
+                    <h1>Mark Attendance</h1>
+                    <p>Use face recognition to automatically mark attendance</p>
+                </div>
+
+                <div class="camera-section">
+                    <h2>Camera Feed</h2>
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn" onclick="startCamera()">📷 Start Camera</button>
+                        <button class="btn btn-secondary" onclick="captureFrame()">📸 Capture Frame</button>
+                        <button class="btn btn-secondary" onclick="stopCamera()">⏹ Stop Camera</button>
+                    </div>
+
+                    <div class="recognized-students" id="recognized-list"></div>
+                </div>
+            </div>
+
+            <!-- Students Page -->
+            <div id="students-page" style="display: none;">
+                <div class="header">
+                    <h1>Students</h1>
+                    <p>Manage student profiles and attendance records</p>
+                </div>
+
+                <div class="stats-grid" id="students-grid"></div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics-page" style="display: none;">
+                <div class="header">
+                    <h1>Analytics</h1>
+                    <p>Detailed attendance analytics and insights</p>
+                </div>
+
+                <div class="chart-card">
+                    <h2>Monthly Attendance Overview</h2>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const AI_URL = 'http://localhost:8001';
+        let videoStream = null;
+
+        // Initialize Charts
+        const trendCtx = document.getElementById('trendChart');
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Attendance %',
+                    data: [88, 92, 87, 90, 85, 78, 82],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: false, min: 70 }
+                }
+            }
+        });
+
+        const subjectCtx = document.getElementById('subjectChart');
+        const subjectChart = new Chart(subjectCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Math', 'Physics', 'Chemistry', 'Biology', 'CS'],
+                datasets: [{
+                    label: 'Attendance %',
+                    data: [92, 88, 90, 85, 95],
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Page Navigation
+        function showPage(page) {
+            document.querySelectorAll('[id$="-page"]').forEach(p => p.style.display = 'none');
+            document.getElementById(page + '-page').style.display = 'block';
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (page === 'students') {
+                loadStudents();
+            }
+        }
+
+        // Camera Functions
+        async function startCamera() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = videoStream;
+                alert('Camera started! Click "Capture Frame" to recognize faces.');
+            } catch (error) {
+                alert('Error accessing camera: ' + error.message);
+            }
+        }
+
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                document.getElementById('video').srcObject = null;
+                videoStream = null;
+            }
+        }
+
+        async function captureFrame() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+            
+            try {
+                const response = await fetch(`${AI_URL}/api/v1/recognize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_base64: imageData })
+                });
+                
+                const students = await response.json();
+                displayRecognizedStudents(students);
+            } catch (error) {
+                alert('Error recognizing faces: ' + error.message);
+            }
+        }
+
+        function displayRecognizedStudents(students) {
+            const list = document.getElementById('recognized-list');
+            list.innerHTML = '<h3>Recognized Students:</h3>';
+            
+            students.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <strong>${student.student_name}</strong><br>
+                    ID: ${student.student_id}<br>
+                    <span class="confidence">Confidence: ${(student.confidence * 100).toFixed(1)}%</span><br>
+                    Liveness: ${student.liveness_verified ? '✓ Verified' : '✗ Failed'}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // Load Students
+        async function loadStudents() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/students`);
+                const students = await response.json();
+                
+                const grid = document.getElementById('students-grid');
+                grid.innerHTML = '';
+                
+                students.forEach(student => {
+                    const card = document.createElement('div');
+                    card.className = 'stat-card';
+                    card.innerHTML = `
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            ${student.first_name[0]}${student.last_name[0]}
+                        </div>
+                        <div class="stat-value" style="font-size: 20px;">
+                            ${student.first_name} ${student.last_name}
+                        </div>
+                        <div class="stat-label">${student.student_code}</div>
+                        <div class="stat-label">${student.department}</div>
+                        <div class="confidence" style="margin-top: 10px;">
+                            ${student.attendance_percentage}% Attendance
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Fetch initial data
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/analytics/dashboard`);
+                const data = await response.json();
+                
+                document.getElementById('total-students').textContent = data.total_students;
+                document.getElementById('present-today').textContent = data.present_today;
+                document.getElementById('absent-today').textContent = data.absent_today;
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        }
+
+        // Initialize
+        fetchDashboardData();
+    </script>
+</body>
+</html>

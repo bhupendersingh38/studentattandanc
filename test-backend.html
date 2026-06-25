@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .status {
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .success { background: #2ecc71; }
+        .error { background: #e74c3c; }
+        .testing { background: #f39c12; }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #2980b9; }
+        pre {
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Backend Connection Test</h1>
+    
+    <div id="status" class="status testing">Testing backend connection...</div>
+    
+    <div id="results"></div>
+    
+    <h3>Manual Tests:</h3>
+    <button onclick="testHealth()">Test /health</button>
+    <button onclick="testDashboard()">Test /api/v1/analytics/dashboard</button>
+    <button onclick="testStudents()">Test /api/v1/students</button>
+    
+    <h3>Backend URL:</h3>
+    <a href="http://localhost:8000" target="_blank" style="color: #3498db;">http://localhost:8000</a><br>
+    <a href="http://localhost:8000/docs" target="_blank" style="color: #3498db;">http://localhost:8000/docs</a>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        async function autoTest() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            try {
+                // Test 1: Basic connection
+                status.textContent = '🔄 Testing basic connection...';
+                const response = await fetch(`${API_URL}/api/v1/analytics/dashboard`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.className = 'status success';
+                    status.textContent = '✅ Backend is RUNNING and RESPONDING!';
+                    
+                    results.innerHTML = `
+                        <h3>✅ Connection Successful!</h3>
+                        <p>Backend Status: <strong>ONLINE</strong></p>
+                        <p>API Response: <strong>OK</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <p><strong>👉 You can now use app.html - just refresh it!</strong></p>
+                    `;
+                } else {
+                    throw new Error('Response not OK');
+                }
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = '❌ Backend is NOT responding';
+                
+                results.innerHTML = `
+                    <h3>❌ Connection Failed</h3>
+                    <p>Error: ${error.message}</p>
+                    <h3>Solutions:</h3>
+                    <ol>
+                        <li>Make sure START_BACKEND_ONLY.bat is running</li>
+                        <li>Look for terminal with "Uvicorn running on http://0.0.0.0:8000"</li>
+                        <li>If no terminal, double-click START_BACKEND_ONLY.bat</li>
+                        <li>Wait 5 seconds and refresh this page</li>
+                    </ol>
+                `;
+            }
+        }
+        
+        async function testHealth() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing /health endpoint...</p>';
+            
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                results.innerHTML = `<h3>Health Check Result:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                results.innerHTML = `<p style="color: #e74c3c;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testDashboard() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing dashboard endpoint...</p>';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/analytics/dashboard`);
+                const data = await response.json();
+                results.innerHTML = `<h3>Dashboard Data:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                results.innerHTML = `<p style="color: #e74c3c;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testStudents() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing students endpoint...</p>';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/students`);
+                const data = await response.json();
+                results.innerHTML = `<h3>Students Data:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                results.innerHTML = `<p style="color: #e74c3c;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(autoTest, 1000);
+        });
+    </script>
+</body>
+</html>
